@@ -13,4 +13,4 @@ Run (e.g.) `cabal run d1` for the Day 1 answers.
 - **Day 1** Basic file IO. A bit more about Cabal's system, including the `data-dir` entry.
 - **Day 2** Using `Text` instead of `String`.
 - **Day 3** The need to be careful with functions that return Int (vs Integer). The `cycle` function, by looking at other solutions.
-- **Day 4** Functions in `Data.Text.Read`. The use of `Data.Map` to facilitate lookup of key-value pairs. (In the first incarnation of my solution I tried too hard to use an enum type; I don't know if I'll be able to refactor it later.)
+- **Day 4** Functions in `Data.Text.Read`. The use of `Data.Map` to facilitate lookup of key-value pairs. (In the first incarnation of my solution I tried too hard to use an enum type; I don't know if I'll be able to refactor it later.) [Common stanzas in Cabal.](https://vrom911.github.io/blog/common-stanzas)
