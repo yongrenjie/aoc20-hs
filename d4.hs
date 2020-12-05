@@ -1,11 +1,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 
+import Data.Char
 import qualified Data.Map.Strict as M
 import Data.Maybe
 import qualified Data.Text as T
 import qualified Data.Text.Read as TR
 import qualified Data.Text.IO as TIO
 import Paths_aoc20_hs
+import Text.Megaparsec
+import Text.Megaparsec.Char
 
 main :: IO ()
 main = do
@@ -15,6 +18,10 @@ main = do
     print $ length . filter isJust . getPassports False $ input
     putStr $ "Part 2: "
     print $ length . filter isJust . getPassports True $ input
+    putStr $ "Part 1 using megaparsec: "
+    print $ length . filter isJust . getPassports' False $ input
+    putStr $ "Part 2 using megaparsec: "
+    print $ length . filter isJust . getPassports' True $ input
 
 data Passport = Passport { byr :: T.Text , iyr :: T.Text , eyr :: T.Text
                          , hgt :: T.Text , hcl :: T.Text , ecl :: T.Text
@@ -109,3 +116,24 @@ validatePID :: T.Text -> Maybe T.Text
 validatePID text = if lengthIs9 && isNumeric then Just text else Nothing
     where lengthIs9 = T.length text == 9
           isNumeric = T.all (`elem` ("1234567890" :: String)) text
+
+
+
+{- An alternative parser with megaparsec -}
+getPassports' :: Bool -> T.Text -> [Maybe Passport]
+getPassports' isPartTwo = map makePassport . map ppTextToMap' . getPPTexts
+    where makePassport = if isPartTwo then makePassportTough else makePassportLax
+
+type Parser = Parsec T.Text T.Text
+ppTextToMap' :: T.Text -> M.Map T.Text T.Text
+ppTextToMap' = either (const M.empty) (M.fromList) . runParser (many p) ""
+    where p :: Parser (T.Text, T.Text)
+          p = do
+              space
+              fieldName <- T.pack <$> many letterChar
+              -- letterChar :: Parser Char
+              -- many :: Parser Char -> Parser [Char]
+              -- but [Char] is String, not T.Text, so we need to manually wrap
+              _ <- char ':'
+              fieldValue <- T.pack <$> some (satisfy (not . isSpace))
+              return (fieldName, fieldValue)

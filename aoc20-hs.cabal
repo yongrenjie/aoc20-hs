@@ -33,4 +33,4 @@ executable d3
 executable d4
   import:              base-stanza
   main-is:             d4.hs
-  build-depends:       text, containers
+  build-depends:       text, containers, megaparsec
