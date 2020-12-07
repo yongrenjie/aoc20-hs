@@ -7,15 +7,18 @@ main = do
     fname <- getDataFileName "d7.txt"
     input <- readFile fname
     let rulebook = parseInput input
+    -- Both of these functions give one extra value (i.e. the requested color
+    -- itself). However, a shiny gold bag cannot contain itself, so we need to
+    -- subtract one both times.
     putStr $ "Part 1: "
-    print $ countValidTopLevel "shiny gold" rulebook
+    print $ (countValidTopLevel "shiny gold" rulebook) - 1
     putStr $ "Part 2: "
     print $ (countTotalContained "shiny gold" rulebook) - 1
-    -- countTotalContained gives a number which includes itself.
 
 type Rule = (String, [(Integer, String)])
 type Rulebook = M.Map String [(Integer, String)]
 
+-- Parsing.
 parseInput :: String -> Rulebook
 parseInput = M.fromList . map getRule . lines
 
@@ -33,28 +36,27 @@ getRule cs = (baseColor, validContents)
                     color :: String -> String
                     color = unwords . take 2 . drop 1 . words
 
+-- isContained checks whether a bag of color _parent_ can contain a bag of color
+-- _child_, according to a rulebook _rb_.
 isContained :: Rulebook -> String -> String -> Bool
 isContained rb child parent = child `isContained2` parent
+    -- The child is contained in the parent either if it is the parent, or if one of
+    -- the parent's containedColors contains the child.
     where isContained2 :: String -> String -> Bool
           child2 `isContained2` parent2 =
               if child2 == parent2 then True
                                    else any (child2 `isContained2`) (containedColors parent2)
-          -- Because a bag of a given colour cannot actually contain itself,
-          -- we have to remember to subtract 1 later on.
           containedColors :: String -> [String]
-          containedColors clr = case M.lookup clr rb of
-                                     Nothing -> []
-                                     Just x -> map snd x
-          -- The Nothing branch should never trigger, unless our input is wrong.
+          containedColors clr = map snd $ M.findWithDefault [] clr rb
 
 countValidTopLevel :: String -> Rulebook -> Int
-countValidTopLevel clr rb = (length . filter (isContained rb clr) $ M.keys rb) - 1
+countValidTopLevel clr rb = (length . filter (isContained rb clr) $ M.keys rb)
 
 countTotalContained :: String -> Rulebook -> Integer
 countTotalContained clr rb =
     case M.lookup clr rb of
          Nothing -> 0
-         Just [] -> 1
          Just contents -> 1 + (sum . map f $ contents)
     where f :: (Integer, String) -> Integer
+          -- The total number of bags in n bags with colour c.
           f = \(n, c) -> n * countTotalContained c rb
