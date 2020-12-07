@@ -43,3 +43,8 @@ executable d6
   import:              base-stanza
   main-is:             d6.hs
   build-depends:       split
+
+executable d7
+  import:              base-stanza
+  main-is:             d7.hs
+  build-depends:       split, containers
