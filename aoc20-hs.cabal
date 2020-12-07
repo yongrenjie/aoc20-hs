@@ -39,3 +39,7 @@ executable d5
   import:              base-stanza
   main-is:             d5.hs
 
+executable d6
+  import:              base-stanza
+  main-is:             d6.hs
+  build-depends:       split
