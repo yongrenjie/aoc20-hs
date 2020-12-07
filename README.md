@@ -15,4 +15,4 @@ Run (e.g.) `cabal run d1` for the Day 1 answers.
 - **Day 3** The need to be careful with functions that return Int (vs Integer). The `cycle` function, by looking at other solutions.
 - **Day 4** Functions in `Data.Text.Read`. The use of `Data.Map` to facilitate lookup of key-value pairs (post-refactoring). [Common stanzas in Cabal.](https://vrom911.github.io/blog/common-stanzas) Basic parser usage (in particular `megaparsec`).
 - **Day 5** was slightly easier. I could technically have gotten more parsing practice in.
-- **Day 6** was nice and easy. I can feel my code getting a bit more organised...
+- **Day 6** was nice and easy. I can feel my code getting a bit more organised. Glancing at some solutions online, it seems like this may have been a good opportunity to learn about `Data.Set`, so maybe I will do so if I find some free time tomorrow.
