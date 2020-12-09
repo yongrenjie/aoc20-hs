@@ -18,3 +18,4 @@ Run (e.g.) `cabal run d1` for the Day 1 answers.
 - **Day 6** was nice and easy. I can feel my code getting a bit more organised. Glancing at some solutions online, it seems like this may have been a good opportunity to learn about `Data.Set`, so maybe I will do so if I find some free time tomorrow.
 - **Day 7** Not much, I guess.
 - **Day 8** Learnt a bit about efficient parsing, especially making full use of operators such as `<$` and `<*`. Tried out `Data.IntSet` and `Data.IntMap`, i.e.  versions of `Set` and `Map` which are optimised for `Int` keys.
+- **Day 9** Just got through it as fast and as inefficiently as I could since I was really, really sleepy.

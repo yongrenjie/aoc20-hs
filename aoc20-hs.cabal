@@ -53,3 +53,7 @@ executable d8
   import:              base-stanza
   main-is:             d8.hs
   build-depends:       containers, megaparsec
+
+executable d9
+  import:              base-stanza
+  main-is:             d9.hs
