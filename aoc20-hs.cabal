@@ -61,3 +61,4 @@ executable d9
 executable d10
   import:              base-stanza
   main-is:             d10.hs
+  build-depends:       containers
