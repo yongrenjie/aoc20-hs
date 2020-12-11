@@ -57,3 +57,7 @@ executable d8
 executable d9
   import:              base-stanza
   main-is:             d9.hs
+
+executable d10
+  import:              base-stanza
+  main-is:             d10.hs
