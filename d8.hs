@@ -60,7 +60,7 @@ initialState = Running (0, 1, IntSet.empty)
 -- Runs the single instruction at the index referred to by the current position
 -- of the program state.
 runProgram :: IntMap Instruction -> ProgramState -> ProgramState
-runProgram inst state = runProg' state
+runProgram inst = runProg'
     where sz = IntMap.size inst
           runProg' (Running s@(acc, pos, visited)) =
               case (IntSet.member pos visited, IntMap.lookup pos inst) of

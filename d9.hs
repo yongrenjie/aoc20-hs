@@ -18,11 +18,10 @@ findBadSum _ []     = error "whoops, should never reach end of list"
 findBadSum n (x:xs) = go [] (x:xs)
     where go :: [Integer] -> [Integer] -> Integer
           go _ []     = error "whoops, should never reach end of list"
-          go s (x:xs) = case fromIntegral (length s) < n of
-                             True  -> go (s ++ [x]) xs
-                             False -> if isPossibleSum x s
-                                         then go (drop 1 s ++ [x]) xs
-                                         else x
+          go s (x:xs) 
+              | fromIntegral (length s) < n = go (s ++ [x]) xs
+              | isPossibleSum x s           = go (drop 1 s ++ [x]) xs
+              | otherwise                   = x
 
 isPossibleSum :: Integer -> [Integer] -> Bool
 isPossibleSum x s = x `elem` allSums

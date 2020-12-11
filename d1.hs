@@ -7,9 +7,9 @@ main = do
     fname <- getDataFileName "d1.txt"
     input <- readFile fname
     putStr "Part 1 (2 integers which add to 2020): "
-    putStrLn . show . getProdOf2Sums . parseInput $ input
+    print . getProdOf2Sums . parseInput $ input
     putStr "Part 2 (3 integers which add to 2020): "
-    putStrLn . show . getProdOf3Sums . parseInput $ input
+    print . getProdOf3Sums . parseInput $ input
 
 parseInput :: String -> [Integer]
 parseInput = fromJust' . traverse readMaybe . words

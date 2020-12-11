@@ -14,13 +14,13 @@ main :: IO ()
 main = do
     fname <- getDataFileName "d4.txt"
     input <- TIO.readFile fname
-    putStr $ "Part 1: "
+    putStr "Part 1: "
     print $ length . filter isJust . getPassports False $ input
-    putStr $ "Part 2: "
+    putStr "Part 2: "
     print $ length . filter isJust . getPassports True $ input
-    putStr $ "Part 1 using megaparsec: "
+    putStr "Part 1 using megaparsec: "
     print $ length . filter isJust . getPassports' False $ input
-    putStr $ "Part 2 using megaparsec: "
+    putStr "Part 2 using megaparsec: "
     print $ length . filter isJust . getPassports' True $ input
 
 data Passport = Passport { byr :: T.Text , iyr :: T.Text , eyr :: T.Text
@@ -31,7 +31,7 @@ data Passport = Passport { byr :: T.Text , iyr :: T.Text , eyr :: T.Text
 -- Converts the input string into a list of valid passports (Just Passport) or
 -- invalid ones (Nothing).
 getPassports :: Bool -> T.Text -> [Maybe Passport]
-getPassports isPartTwo = map makePassport . map ppTextToMap . getPPTexts
+getPassports isPartTwo = map (makePassport . ppTextToMap) . getPPTexts
     where makePassport = if isPartTwo then makePassportTough else makePassportLax
 
 
@@ -108,7 +108,7 @@ validateHCL text = if headIsHash && tailLengthIs6 && tailIsHex
           tailIsHex     = T.all (`elem` ("ABCDEFabcdef1234567890" :: String)) (T.tail text)
 
 validateECL :: T.Text -> Maybe T.Text
-validateECL text = if elem text ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
+validateECL text = if text `elem` ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
                       then Just text
                       else Nothing
 
@@ -121,12 +121,12 @@ validatePID text = if lengthIs9 && isNumeric then Just text else Nothing
 
 {- An alternative parser with megaparsec -}
 getPassports' :: Bool -> T.Text -> [Maybe Passport]
-getPassports' isPartTwo = map makePassport . map ppTextToMap' . getPPTexts
+getPassports' isPartTwo = map (makePassport . ppTextToMap') . getPPTexts
     where makePassport = if isPartTwo then makePassportTough else makePassportLax
 
 type Parser = Parsec T.Text T.Text
 ppTextToMap' :: T.Text -> M.Map T.Text T.Text
-ppTextToMap' = either (const M.empty) (M.fromList) . runParser (many p) ""
+ppTextToMap' = either (const M.empty) M.fromList . runParser (many p) ""
     where p :: Parser (T.Text, T.Text)
           p = do
               space

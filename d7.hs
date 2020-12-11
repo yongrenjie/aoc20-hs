@@ -10,10 +10,10 @@ main = do
     -- Both of these functions give one extra value (i.e. the requested color
     -- itself). However, a shiny gold bag cannot contain itself, so we need to
     -- subtract one both times.
-    putStr $ "Part 1: "
-    print $ (countValidTopLevel "shiny gold" rulebook) - 1
-    putStr $ "Part 2: "
-    print $ (countTotalContained "shiny gold" rulebook) - 1
+    putStr "Part 1: "
+    print $ countValidTopLevel "shiny gold" rulebook - 1
+    putStr "Part 2: "
+    print $ countTotalContained "shiny gold" rulebook - 1
 
 type Rule = (String, [(Integer, String)])
 type Rulebook = M.Map String [(Integer, String)]
@@ -43,14 +43,13 @@ isContained rb child parent = child `isContained2` parent
     -- The child is contained in the parent either if it is the parent, or if one of
     -- the parent's containedColors contains the child.
     where isContained2 :: String -> String -> Bool
-          child2 `isContained2` parent2 =
-              if child2 == parent2 then True
-                                   else any (child2 `isContained2`) (containedColors parent2)
+          child2 `isContained2` parent2 = (child2 == parent2)
+              || any (child2 `isContained2`) (containedColors parent2)
           containedColors :: String -> [String]
           containedColors clr = map snd $ M.findWithDefault [] clr rb
 
 countValidTopLevel :: String -> Rulebook -> Int
-countValidTopLevel clr rb = (length . filter (isContained rb clr) $ M.keys rb)
+countValidTopLevel clr rb = length . filter (isContained rb clr) $ M.keys rb
 
 countTotalContained :: String -> Rulebook -> Integer
 countTotalContained clr rb =

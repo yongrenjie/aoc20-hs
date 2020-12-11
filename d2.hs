@@ -64,4 +64,4 @@ parseLine line = PChecker minInt maxInt c pw
 - Find the number of valid passwords in an input
 -}
 processInput :: (PasswordChecker -> Bool) -> T.Text -> Int
-processInput isValid = length . filter id . map isValid . map parseLine . T.lines
+processInput isValid = length . filter id . map (isValid . parseLine) . T.lines

@@ -44,7 +44,7 @@ isTree n fl = (n `rem` width fl) `elem` trees fl
 - Parse a line of input into a ForestLine.
 -}
 parseLine :: String -> ForestLine
-parseLine cs = ForestLine (fst t) (snd t)
+parseLine cs = uncurry ForestLine t
     where t = foldl' accum (0, []) cs
           accum :: (XCoord, [XCoord]) -> Char -> (XCoord, [XCoord])
           accum (a, xs) '#' = (a+1, a:xs)
