@@ -20,3 +20,9 @@ Run (e.g.) `cabal run d1` for the Day 1 answers.
 - **Day 8** Learnt a bit about efficient parsing, especially making full use of operators such as `<$` and `<*`. Tried out `Data.IntSet` and `Data.IntMap`, i.e.  versions of `Set` and `Map` which are optimised for `Int` keys.
 - **Day 9** Just got through it as fast and as inefficiently as I could since I was really, really sleepy.
 - **Day 10** [Dynamic programming.](https://www.geeksforgeeks.org/dynamic-programming/)
+- **Day 11** Re-learnt the hard way that in a list comprehension, the last variable changes the quickest.
+
+```haskell
+Prelude> [(x, y) | x <- [1..2], y <- "abc"]
+[(1,'a'),(1,'b'),(1,'c'),(2,'a'),(2,'b'),(2,'c')]
+```

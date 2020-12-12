@@ -62,3 +62,8 @@ executable d10
   import:              base-stanza
   main-is:             d10.hs
   build-depends:       containers
+
+executable d11
+  import:              base-stanza
+  main-is:             d11.hs
+  build-depends:       containers, split
