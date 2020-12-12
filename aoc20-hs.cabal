@@ -13,6 +13,10 @@ data-dir:            inputs
 -- common stanzas: see https://vrom911.github.io/blog/common-stanzas
 common base-stanza
   build-depends:       base ^>=4.14
+                       , split
+                       , text
+                       , containers
+                       , megaparsec
   default-language:    Haskell2010
   other-modules:       Paths_aoc20_hs
   ghc-options:         -Wall -O2
@@ -24,7 +28,6 @@ executable d1
 executable d2
   import:              base-stanza
   main-is:             d2.hs
-  build-depends:       text
 
 executable d3
   import:              base-stanza
@@ -33,7 +36,6 @@ executable d3
 executable d4
   import:              base-stanza
   main-is:             d4.hs
-  build-depends:       text, containers, megaparsec
 
 executable d5
   import:              base-stanza
@@ -42,17 +44,14 @@ executable d5
 executable d6
   import:              base-stanza
   main-is:             d6.hs
-  build-depends:       split
 
 executable d7
   import:              base-stanza
   main-is:             d7.hs
-  build-depends:       split, containers
 
 executable d8
   import:              base-stanza
   main-is:             d8.hs
-  build-depends:       containers, megaparsec
 
 executable d9
   import:              base-stanza
@@ -61,9 +60,11 @@ executable d9
 executable d10
   import:              base-stanza
   main-is:             d10.hs
-  build-depends:       containers
 
 executable d11
   import:              base-stanza
   main-is:             d11.hs
-  build-depends:       containers, split
+
+executable d12
+  import:              base-stanza
+  main-is:             d12.hs

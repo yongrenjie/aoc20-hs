@@ -26,3 +26,5 @@ Run (e.g.) `cabal run d1` for the Day 1 answers.
 Prelude> [(x, y) | x <- [1..2], y <- "abc"]
 [(1,'a'),(1,'b'),(1,'c'),(2,'a'),(2,'b'),(2,'c')]
 ```
+
+- **Day 12** Not much? The `foldl'` solution is so natural, I'm not sure what else I could be doing. Well, I learnt about the `ST` monad earlier in the day, so maybe that counts as learning something.
