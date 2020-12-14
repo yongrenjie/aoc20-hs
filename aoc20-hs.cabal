@@ -68,3 +68,7 @@ executable d11
 executable d12
   import:              base-stanza
   main-is:             d12.hs
+
+executable d13
+  import:              base-stanza
+  main-is:             d13.hs
