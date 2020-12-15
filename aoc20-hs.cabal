@@ -17,6 +17,7 @@ common base-stanza
                        , text
                        , containers
                        , megaparsec
+                       , mtl
   default-language:    Haskell2010
   other-modules:       Paths_aoc20_hs
   ghc-options:         -Wall -O2
@@ -72,3 +73,7 @@ executable d12
 executable d13
   import:              base-stanza
   main-is:             d13.hs
+
+executable d14
+  import:              base-stanza
+  main-is:             d14.hs

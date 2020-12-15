@@ -29,3 +29,4 @@ Prelude> [(x, y) | x <- [1..2], y <- "abc"]
 
 - **Day 12** Not much? The `foldl'` solution is so natural, I'm not sure what else I could be doing. Well, I learnt about the `ST` monad earlier in the day, so maybe that counts as learning something.
 - **Day 13** Got spoiled on Reddit and found that this is a question about the [Chinese remainder theorem](https://en.wikipedia.org/wiki/Chinese_remainder_theorem). Just as well, though, because I wouldn't have managed to solve it otherwise. (I had an inefficient solution which worked on the test cases, but was too slow on the real input.)
+- **Day 14** Revision of State monad. It took a long time, but I am really happy with the way this code came out!
