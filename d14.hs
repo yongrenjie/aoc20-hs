@@ -3,6 +3,7 @@ import           Data.Int                    (Int64)
 import           Data.Map                    (Map)
 import qualified Data.Map             as      M
 import           Data.List                   (foldl')
+import           Data.Maybe                  (fromMaybe)
 import           Control.Monad.State
 import           Text.Megaparsec      hiding (State)
 import           Text.Megaparsec.Char
@@ -65,7 +66,7 @@ data Instruction = SetMask Mask
                  deriving (Eq, Show)
 type Parser = Parsec String String
 parseLine :: String -> Instruction
-parseLine = maybe (error "bad input") id . parseMaybe (parseSetMask <|> parseSetMem)
+parseLine = fromMaybe (error "bad input") . parseMaybe (parseSetMask <|> parseSetMem)
 parseSetMask :: Parser Instruction
 parseSetMask = do
     _ <- string "mask = "
@@ -86,7 +87,7 @@ parseSetMem = do
 -- Part 1
 mkState1 :: Instruction -> S
 mkState1 ins = state (f ins)
-    where f (SetMask newMask) = \_ -> ([], newMask)
+    where f (SetMask newMask) = const ([], newMask)
           f (SetMem addr val) = \mask -> ([(addr, applyMask1 mask val)], mask)
 -- Apply the bit mask to the value.
 applyMask1 :: Mask -> Val -> Val
@@ -96,7 +97,7 @@ applyMask1 (zeros, ones, _) val = let val2 = foldl' clearBit val zeros
 -- Part 2
 mkState2 :: Instruction -> S
 mkState2 ins = state (f ins)
-    where f (SetMask newMask) = \_ -> ([], newMask)
+    where f (SetMask newMask) = const ([], newMask)
           f (SetMem addr val) = \mask -> ([(addr', val) | addr' <- applyMask2 mask addr], mask)
 -- Generate all possible memory addresses that will be written to after application
 -- of a mask to an address.

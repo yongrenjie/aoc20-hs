@@ -10,14 +10,14 @@ main = do
     putStr "Part 1: "
     print $ uncurry (*) . head . sortOn snd . map (getWaitTime minTime) $ busIDs
     putStr "Part 2: "
-    print $ buses
+    print buses
     print $ findSmallestN buses
 
 parseInput :: String -> (Int, [(Int, Int)])
 parseInput input = (minTime, buses)
     where [minTimeString, busString] = lines input
           minTime = read minTimeString
-          buses = map (\(index, busID) -> (index, read busID))
+          buses = map (fmap read)
                   . filter ((/= "x") . snd) 
                   . zip [0..]
                   . splitOn ","
@@ -40,7 +40,7 @@ findSmallestN buses = ans
           prod = product ns
           ms = map (prod `div`) ns
           cs = [m * (m `invMod` n) | (m, n) <- zip ms ns]
-          ans = (sum $ zipWith (*) as cs) `mod` prod
+          ans = sum (zipWith (*) as cs) `mod` prod
           invMod :: Int -> Int -> Int
           -- m `invMod` n computes m^{-1} mod n, i.e. the value of x such
           -- that m * x == 1 (mod n).

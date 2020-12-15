@@ -20,7 +20,7 @@ data Instruction = North Int | South Int | East Int | West Int
                  deriving (Eq, Show)
 
 parseInput :: String -> [Instruction]
-parseInput = map (\l -> fromJust $ parseMaybe p l) . lines
+parseInput = map (fromJust . parseMaybe p) . lines
     where p :: Parser Instruction
           p = do
               action <- choice [ North   <$ char 'N'

@@ -10,9 +10,9 @@ main = do
     fname <- getDataFileName "d11.txt"
     layout <- parseInput <$> readFile fname
     putStr "Part 1: "
-    print $ countOccupied . (runUntilUnchanged 1) $ layout
+    print $ countOccupied . runUntilUnchanged 1 $ layout
     putStr "Part 2: "
-    print $ countOccupied . (runUntilUnchanged 2) $ layout
+    print $ countOccupied . runUntilUnchanged 2 $ layout
 
 data Seat = Occupied | Empty | Floor deriving (Eq, Show)
 
@@ -23,7 +23,7 @@ type Layout = (Int, Int, Map (Int, Int) Seat)
 -- Parses the input into an instance of the seat layout.
 parseInput :: String -> Layout
 parseInput input = (nrows, ncols, initialState)
-    where noSpaces = filter (not . isSpace) $ input
+    where noSpaces = filter (not . isSpace) input
           ncols = length $ takeWhile (`elem` "#L.") input
           nrows = length noSpaces `div` ncols
           initialState = M.fromList . zip seats . map conv $ noSpaces
@@ -64,8 +64,8 @@ runRules part (nrows, ncols, oldState) = (nrows, ncols, newState)
         -- or 2.
         adjOccupied :: (Int, Int) -> Int
         adjOccupied = length                           -- count number of occupied seats
-                      . filter (== (Just Occupied))    -- check which of them are occupied
-                      . map (flip M.lookup oldState)   -- find the state of the seats
+                      . filter (== Just Occupied)      -- check which of them are occupied
+                      . map (oldState M.!?)            -- find the state of the seats
                       . adjacencyFn                    -- get all neighbouring seats
         adjacencyFn = case part of
                            1 -> immediateNeighbours
@@ -78,7 +78,7 @@ runRules part (nrows, ncols, oldState) = (nrows, ncols, newState)
         immediateNeighbours (r, c) = do
             dr <- [-1..1]
             dc <- [-1..1]
-            guard $ (dr /= 0 || dc /= 0)
+            guard (dr /= 0 || dc /= 0)
             return (r + dr, c + dc)
         -- Returns line-of-sight neighbours of a seat. Includes out of bounds
         -- seats since looking them up will return Nothing, and we filter for
@@ -87,7 +87,7 @@ runRules part (nrows, ncols, oldState) = (nrows, ncols, newState)
         lineOfSightNeighbours (r, c) = do
             dr <- [-1..1]
             dc <- [-1..1]
-            guard $ (dr /= 0 || dc /= 0)
+            guard (dr /= 0 || dc /= 0)
             return $ getNextLineOfSight (dr, dc) (r, c)
         -- Returns the line-of-sight neighbour of a seat (r, c) in a direction
         -- (dr, dc). This can return out-of-bounds neighbours if there are no
