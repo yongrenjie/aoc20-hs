@@ -1,12 +1,12 @@
-import Control.Monad (guard)
-import Data.List (delete, transpose, (\\), isPrefixOf)
-import Data.List.Split (splitOn)
-import Data.Map.Strict (Map)
-import Data.Maybe (fromMaybe)
-import Text.Megaparsec
-import Text.Megaparsec.Char
-import qualified Data.Map.Strict as M
-import Paths_aoc20_hs ( getDataFileName )
+import           Control.Monad        (guard)
+import           Data.List            (delete, isPrefixOf, transpose, (\\))
+import           Data.List.Split      (splitOn)
+import           Data.Map.Strict      (Map)
+import qualified Data.Map.Strict      as M
+import           Data.Maybe           (fromMaybe)
+import           Paths_aoc20_hs       (getDataFileName)
+import           Text.Megaparsec
+import           Text.Megaparsec.Char
 
 main :: IO ()
 main = do
@@ -57,7 +57,7 @@ parseTickets my yours = map lineToTicket . filter ((`elem` "1234567890") . head)
     lineToTicket = map read . splitOn ","
 
 -- Part 1
-isValidValue :: Int -> (Int, Int, Int, Int) -> Bool 
+isValidValue :: Int -> (Int, Int, Int, Int) -> Bool
 isValidValue x (min1, max1, min2, max2) = (x >= min1 && x <= max1) || (x >= min2 && x <= max2)
 isInvalidValue :: Int -> (Int, Int, Int, Int) -> Bool
 isInvalidValue x t = not (isValidValue x t)
@@ -139,6 +139,6 @@ solve3 rb ts = map head $ runUntilUnchanged removeKnowns validFields
         trimKnowns knownf allf = case length allf of
                                       1 -> allf
                                       _ -> allf \\ knownf
-    
+
     runUntilUnchanged :: Eq a => (a -> a) -> a -> a
     runUntilUnchanged f x = let x' = f x in if x' == x then x else runUntilUnchanged f x'
