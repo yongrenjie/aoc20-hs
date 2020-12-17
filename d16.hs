@@ -70,7 +70,7 @@ isValidValueForAnyField x rb = any (isValidValue x) (M.elems rb)
 
 -- Part 2
 isValidTicket :: Rulebook -> Ticket -> Bool
-isValidTicket rb ts = all (`isValidValueForAnyField` rb) ts
+isValidTicket rb = all (`isValidValueForAnyField` rb)
 
 -- Exponential scaling, works on sample input but too slow on real input
 solve :: [String] -> Rulebook -> Int -> [Ticket] -> [[String]]
