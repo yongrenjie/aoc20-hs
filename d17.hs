@@ -3,18 +3,33 @@ import           Data.IntSet                    ( IntSet )
 import qualified Data.IntSet                   as IS
 import           Paths_aoc20_hs
 
-{- Overall strategy
+{-
+- Overall strategy
+- ----------------
 -
-- We'll start by using an IntSet to store the game state. Because there are only six
-- game turns, if the initial input has a size of (m * m * 1), the final game state can
-- *at most* have a size of (m + 12) * (m + 12) * (1 + 12). For the test input (m = 3),
-- this comes out to 2925; for the real input (m = 8), this is 5200.
+- It appears that nearly all of the board will be empty, so it doesn't make sense
+- to use a list or a vector to store what is mostly empty space. In a way, we need
+- a sparse 4D matrix... which seems like it can be appropriately represented by an
+- IntSet.
 -
-- Active squares will be in the set, and inactive squares not in the set.
+- In our IntSet, Ints corresponding to active cells will be members of the set.
+- This means that each position in the game board must be mapped to a unique Int
+- to be stored in the set.
 -
-- We can map the input square (x, y, z) to (z * (m + 12) * (m + 12)) + (y * (m + 12)) + x,
-- using a trick suggested by /u/tel at https://www.reddit.com/r/haskell/comments/34kqer.
+- Since there are only six game turns, if the initial input has a size of m*m*1*1,
+- the final game state can at most have a size of (m+12)*(m+12)*(1+12)*(1+12). In
+- practice, it is a bit less confusing to just use (m+12)*(m+12)*(m+12)*(m+12). So,
+- we can map (x, y, z, w) to a unique Int through
 -
+-    (x, y, z, w) --> (x+6)*((m+12)^3) + (y+6)*((m+12)^2) + (z+6)*(m+12) + (w+6)
+-
+- where we add 6 to everything to avoid negative numbers. (This also makes the
+- reverse conversion much easier as we can just `divMod` without fear.) This is
+- handled by `ind` and `deind`.
+-
+- This is a strategy adopted from /u/tel's post at
+-
+-     https://www.reddit.com/r/haskell/comments/34kqer
 -}
 
 -- We'll hardcode this. I'm just way too lazy to pass it around all the time.
@@ -47,6 +62,8 @@ ind :: (Int, Int, Int, Int) -> Int
 ind (x, y, z, w) =
   let m12 = initialSize + (2 * nTurns)
   in  ((((w + nTurns) * m12) + (z + nTurns)) * m12 + (y + nTurns)) * m12 + x + nTurns
+  -- Horner's method.
+
 deind :: Int -> (Int, Int, Int, Int)
 deind n =
   let m12       = initialSize + (2 * nTurns)
@@ -66,6 +83,11 @@ getAdj isPart2 = IS.fromList . map ind . f . deind
     z' <- [z - 1 .. z + 1]
     w' <- if isPart2 then [w - 1 .. w + 1] else [w]
     guard $ (x', y', z', w') /= (x, y, z, w)
+    -- Note that we do not need to check for out-of-bounds, because it is impossible
+    -- that an out-of-bounds square will become active during the six game turns. Thus,
+    -- an out-of-bounds square will never be in the IntSet game state (i.e. it is
+    -- always inactive), which is equivalent to it not existing in the first place.
+    -- If we ran the game for more than 6 turns we would have to enlarge the IntSet.
     return (x', y', z', w')
 
 -- Count how many cells adjacent to cell i are active in the current game
