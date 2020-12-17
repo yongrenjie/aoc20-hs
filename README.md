@@ -32,3 +32,4 @@ Prelude> [(x, y) | x <- [1..2], y <- "abc"]
 - **Day 14** Revision of State monad. It took a long time, but I am really happy with the way this code came out!
 - **Day 15** More State monad. This solution is really, really slow. It can be a lot faster with mutable arrays, but I don't really have the energy to do that today. Perhaps another time.
 - **Day 16** Not much new Haskell, but learnt a bit about the problem structure. Also did it in VS Code. I think I'll go back to Vim.
+- **Day 17** Not much from today's problem specifically. I'm quite pleased that I figured out how to not repeat code, though.

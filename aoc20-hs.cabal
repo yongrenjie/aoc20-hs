@@ -100,3 +100,8 @@ executable d15
 executable d16
   import:              base-stanza
   main-is:             d16.hs
+
+executable d17
+  import:              base-stanza
+  main-is:             d17.hs
+
