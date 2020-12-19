@@ -33,3 +33,4 @@ Prelude> [(x, y) | x <- [1..2], y <- "abc"]
 - **Day 15** More State monad. This solution is really, really slow. It can be a lot faster with mutable arrays, but I don't really have the energy to do that today. Perhaps another time.
 - **Day 16** Not much new Haskell, but learnt a bit about the problem structure. Also did it in VS Code. I think I'll go back to Vim.
 - **Day 17** Not much from today's problem specifically. I'm quite pleased that I figured out how to not repeat code, though.
+- **Day 18** Serious grammar and parsing practice, a lot harder than some of the other expression parsing exercises I've done!

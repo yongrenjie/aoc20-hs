@@ -105,3 +105,11 @@ executable d17
   import:              base-stanza
   main-is:             d17.hs
 
+executable d18a
+  import:              base-stanza
+  main-is:             d18a.hs
+
+executable d18b
+  import:              base-stanza
+  main-is:             d18b.hs
+
