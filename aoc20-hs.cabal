@@ -117,5 +117,9 @@ executable d18b
 executable d19
   import:              base-stanza
   main-is:             d19.hs
-  build-depends:       once
+
+executable d20
+  import:              base-stanza
+  main-is:             d20.hs
+  build-depends:       vector, matrix
 
