@@ -30,11 +30,16 @@ extractRuleNumber :: String -> Int
 extractRuleNumber = read . head . splitOn ":"
 
 getParser' :: [String] -> Int -> Parser ()
-getParser' sortedRules n = p n
+getParser' sortedRules = p
  where
   -- This is tantalisingly close to the typical memoisation model in Haskell,
-  -- but doesn't work 100%, as close to 1000 rules are being parsed (there are
-  -- only 136 rules in the puzzle input).
+  -- and is very close to 100%, as `pRuleToParser` is only being called 159 times
+  -- (there are 136 rules in the puzzle input).
+  --
+  -- Previous iterations:
+  --   - I wrote getParser' sortedRules n = p n (not eta-reduced) (1461 calls).
+  --   - I used an IntMap instead of a plain list (198,696 calls).
+  --   - I also tried it with a plain old association list. (938 calls)
   table = map (snd . parseRule sortedRules) sortedRules
   p     = (table !!)
 
@@ -46,9 +51,8 @@ pRuleToParser srules = do
   ruleNumber <- read <$> some digitChar
   _          <- string ": "
   ruleParser <- try (pOrRule srules) <|> try (pAndRule srules) <|> (pCharRule srules)
-  -- From these traced values it is obvious that the same rule is being parsed
-  -- multiple times. (In total, 1461 values get traced, which is still 10x the number
-  -- of rules; however, it's already far better than the IntMap version.)
+  -- From these traced values we can tell that the same rule is being parsed
+  -- multiple times.
   return $ show ruleNumber `trace` (ruleNumber, ruleParser)
 
 pOrRule :: [String] -> Parser (Parser ())
