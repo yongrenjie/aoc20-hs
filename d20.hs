@@ -10,7 +10,6 @@ import qualified Data.Matrix                   as M
 import qualified Data.Vector                   as V
 import           Paths_aoc20_hs
 
-
 {-
 - Overall strategy
 - ----------------
@@ -108,11 +107,6 @@ data Tile = Tile
   }
   deriving (Eq, Show)
 
--- Return all possible edges of a tile.
-getAllEdges :: Tile -> [Edge]
-getAllEdges tile =
-  [ f (g tile) | f <- [id, V.reverse], g <- [north, east, south, west] ]
-
 parseTile :: String -> Tile
 parseTile t = Tile i n e s w x
  where
@@ -125,23 +119,29 @@ parseTile t = Tile i n e s w x
   w                = V.fromList $ reverse (map head rest01s)
   x                = M.fromLists $ map (init . tail) (init . tail $ rest01s)
 
+-- Return all possible edges of a tile.
+getAllEdges :: Tile -> [Edge]
+getAllEdges tile =
+  [ f (g tile) | f <- [id, V.reverse], g <- [north, east, south, west] ]
+
 -- Counts the number of edges of a tile that can match with any other edge in
 -- a set of tiles. If this number is 2, then the tile is a corner tile. If
 -- it's 3, then it's on the edge. If it's 4, then it's in the middle somewhere.
 countMatchableEdges :: [Tile] -> Tile -> Int
-countMatchableEdges allTiles tile = n
+countMatchableEdges allTiles tile = length . filter id $ searchHits
  where
-  allEdges =
+  allOtherEdges :: [Edge]  -- All edges of other tiles.
+  allOtherEdges =
     [ f t
     | f <- [north, south, east, west]
     , t <- allTiles
     , idnum t /= idnum tile
     ]
-  searchQueries =
+  thisTileEdges :: [Edge] -- The edges of the current tile, flipped in all ways.
+  thisTileEdges =
     [ f (g tile) | f <- [id, V.reverse], g <- [north, south, east, west] ]
-  searchHits = map (\q -> length $ filter (== q) allEdges) searchQueries
-  n          = sum searchHits
-
+  searchHits :: [Bool]    -- Whether each edge was found in allOtherEdges.
+  searchHits = map (`elem` allOtherEdges) thisTileEdges
 
 -- Flip a matrix horizontally
 flipH :: M.Matrix a -> M.Matrix a
@@ -153,80 +153,92 @@ flipV :: M.Matrix a -> M.Matrix a
 flipV m =
   let r = M.nrows m
   in  (foldl' (\f x -> f . M.switchRows x (r + 1 - x)) id [1 .. r `div` 2]) m
-
 -- Flip a tile horizontally
 tflipH :: Tile -> Tile
 tflipH (Tile i n e s w x) = Tile i (r n) (r w) (r s) (r e) (flipH x)
+  where r = V.reverse
+-- Flip a tile vertically
+tflipV :: Tile -> Tile
+tflipV (Tile i n e s w x) = Tile i (r s) (r e) (r n) (r w) (flipV x)
   where r = V.reverse
 -- Rotate a tile by 90 degrees clockwise.
 trotate :: Tile -> Tile
 trotate (Tile i n e s w x) = Tile i w n e s (flipH . M.transpose $ x)
 
+-- Given a list of all tiles and the (already correctly oriented) leftmost tile
+-- in a row, find the series of appropriately rotated tiles that make up the row.
+-- The algorithm assumes that there is only one unique way to do this.
 solveRow :: [Tile] -> Tile -> [Tile]
-solveRow allTiles leftmost = result
+solveRow allTiles leftmost = map fromJust
+                             . takeWhile isJust
+                             . iterate (getNextTile . fromJust)
+                             $ Just leftmost
  where
-  result =
-    map fromJust . takeWhile isJust . iterate (getNextTile . fromJust) $ Just
-      leftmost
   getNextTile :: Tile -> Maybe Tile
   getNextTile leftTile = case rightTiles of
     []  -> Nothing  -- No matches found, i.e. we reached the end of the row.
     [x] -> Just $ orientT edgeToMatch x
-    _   -> error "uh oh"  -- We assume there is only one match.
+    _   -> error "uh oh: solveRow"  -- We assume there is only one match.
    where
     otherTiles  = [ t | t <- allTiles, idnum t /= idnum leftTile ]
     edgeToMatch = east leftTile
-    -- we assume here that only one tile can match
     rightTiles  = filter (matchT edgeToMatch) otherTiles
   -- `matchT edge tile` checks whether the given tile can possibly be
   -- oriented in such a way that matches the given edge.
   matchT :: Edge -> Tile -> Bool
-  matchT target tile = target `elem` getAllEdges tile
+  matchT edge tile = edge `elem` getAllEdges tile
   -- Assuming we have found a tile that goes on the *right* of a target
   -- edge, `orientT target tile` will return tile correctly oriented. We
   -- need to carefully check which edge of the tile matches the target
   -- edge, and flip and/or rotate the tile appropriately based on that.
   orientT :: Edge -> Tile -> Tile
-  orientT target tile
-    | target == V.reverse (west tile)  = tile
-    | target == V.reverse (south tile) = trotate tile
-    | target == V.reverse (east tile)  = trotate . trotate $ tile
-    | target == V.reverse (north tile) = trotate . trotate . trotate $ tile
-    | target == (west tile)            = tflipH . trotate . trotate $ tile
-    | target == (south tile)           = trotate . tflipH $ tile
-    | target == (east tile)            = tflipH tile
-    | target == (north tile)           = tflipH . trotate $ tile
-    | otherwise                        = error "uh oh"
+  orientT edge tile
+    | edge == V.reverse (west tile)  = tile
+    | edge == V.reverse (south tile) = trotate tile
+    | edge == V.reverse (east tile)  = trotate . trotate $ tile
+    | edge == V.reverse (north tile) = trotate . trotate . trotate $ tile
+    | edge == (west tile)            = tflipV tile
+    | edge == (south tile)           = trotate . tflipH $ tile
+    | edge == (east tile)            = tflipH tile
+    | edge == (north tile)           = tflipH . trotate $ tile
+    | otherwise                        = error "uh oh: orientT in solveRow"
+    -- There *has* to be a match, given that the tile we feed to orientT was
+    -- obtained by searching for a match. If there isn't, something is wrong.
 
+
+-- This code is the same as solveRow except that the directions are changed.
+-- I don't particularly like that the code repeats itself, but I think this
+-- is genuinely the simplest way to do it rather than trying to combine
+-- it into one big function with lots of if/elses.
 solveColumn :: [Tile] -> Tile -> [Tile]
-solveColumn allTiles topmost = result
+solveColumn allTiles topmost = map fromJust
+                               . takeWhile isJust
+                               . iterate (getNextTile . fromJust)
+                               $ Just topmost
  where
-    -- This code is the same as solveRow except that the directions are changed.
-  result =
-    map fromJust . takeWhile isJust . iterate (getNextTile . fromJust) $ Just
-      topmost
   getNextTile :: Tile -> Maybe Tile
   getNextTile topTile = case bottomTiles of
     []  -> Nothing
     [x] -> Just $ orientT edgeToMatch x
-    _   -> error "uh oh"
+    _   -> error "uh oh: solveColumn"
    where
     otherTiles  = [ t | t <- allTiles, idnum t /= idnum topTile ]
     edgeToMatch = south topTile
     bottomTiles = filter (matchT edgeToMatch) otherTiles
   matchT :: Edge -> Tile -> Bool
-  matchT target tile = target `elem` getAllEdges tile
+  matchT edge tile = edge `elem` getAllEdges tile
   orientT :: Edge -> Tile -> Tile
-  orientT target tile
-    | target == V.reverse (north tile) = tile
-    | target == V.reverse (west tile)  = trotate tile
-    | target == V.reverse (south tile) = trotate . trotate $ tile
-    | target == V.reverse (east tile)  = trotate . trotate . trotate $ tile
-    | target == (north tile)           = tflipH tile
-    | target == (west tile)            = tflipH . trotate $ tile
-    | target == (south tile)           = tflipH . trotate . trotate $ tile
-    | target == (east tile)            = trotate . tflipH $ tile
-    | otherwise                        = error "uh oh"
+  orientT edge tile
+    | edge == V.reverse (north tile) = tile
+    | edge == V.reverse (west tile)  = trotate tile
+    | edge == V.reverse (south tile) = trotate . trotate $ tile
+    | edge == V.reverse (east tile)  = trotate . trotate . trotate $ tile
+    | edge == (north tile)           = tflipH tile
+    | edge == (west tile)            = tflipH . trotate $ tile
+    | edge == (south tile)           = tflipV $ tile
+    | edge == (east tile)            = trotate . tflipH $ tile
+    | otherwise                        = error "uh oh: orientT in solveColumn"
+
 
 -- Orient the top-left corner such that the edges that match other tiles
 -- are facing the east and south.
@@ -241,6 +253,7 @@ orientTopLeftCorner allTiles tile = tile'
     , t <- allTiles
     , idnum t /= idnum tile
     ]
+  -- These show which edges can match with other tiles, i.e. are inside.
   nIn, eIn, sIn, wIn :: Bool
   [nIn, eIn, sIn, wIn] =
     map (\f -> f tile `elem` allOtherEdges) [north, east, south, west]
@@ -248,7 +261,8 @@ orientTopLeftCorner allTiles tile = tile'
         | wIn && sIn = trotate . trotate . trotate $ tile
         | nIn && wIn = trotate . trotate $ tile
         | eIn && nIn = trotate $ tile
-        | otherwise  = error "uh oh"
+        | otherwise  = error "uh oh: orientTopLeftCorner"
+
 
 -- Serpents of various orientations.
 serpentFlat :: String
@@ -261,10 +275,10 @@ s1h = M.fromLists serpent  -- right side up
 s2h = flipV s1h            -- vertically flipped
 s3h = flipH s1h            -- horizontally flipped
 s4h = flipV . flipH $ s1h  -- rotated 180 degrees
-s1v = M.transpose . M.fromLists $ serpent   -- The vertical serpents. Same thing.
+s1v = M.transpose s1h      -- The vertical serpents. Same thing.
 s2v = flipV s1v
 s3v = flipH s1v
-s4v = flipV . flipH $ s1h
+s4v = flipV . flipH $ s1v
 allSerpents :: [M.Matrix Int]
 allSerpents = [s1h, s2h, s3h, s4h, s1v, s2v, s3v, s4v]
 
