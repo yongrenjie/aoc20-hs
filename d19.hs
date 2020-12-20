@@ -56,7 +56,7 @@ import           Paths_aoc20_hs
 -
 -     getParser = tabulate sortedRules getParserK  ................. (2')
 -
-- The concept is the same, just that the implementation is abit more awkward.
+- The concept is the same, just that the implementation is a bit more awkward.
 -
 - By enabling the calls to `trace` in lines 127-131, one can prove that this approach
 - only parses each rule once.
@@ -87,9 +87,9 @@ main = do
       -- of parser 31. So, altogether, the new rule 0 is (n + m) parser42's
       -- and m parser31's, where n > m > 0.
       newParser0 = do
-        n <- some $ try parser42
-        m <- some parser31      -- `some` enforces m > 0.
-        guard $ length n > length m
+        nPlusM <- some $ try parser42
+        m      <- some parser31        -- `some` enforces m > 0.
+        guard $ length nPlusM > length m
         return ()
       successes' = map (parseMessageWith newParser0) messages
   print $ length (filter id successes')
