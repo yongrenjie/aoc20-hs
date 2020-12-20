@@ -44,9 +44,9 @@ main = do
   input <- readFile fname
   let s = initialise input
   putStr "Part 1: "
-  print $ IS.size . head . drop nTurns $ iterate (update False) s
+  print $ IS.size . (!! max 0 nTurns) $ iterate (update False) s
   putStr "Part 2: "
-  print $ IS.size . head . drop nTurns $ iterate (update True) s
+  print $ IS.size . (!! max 0 nTurns) $ iterate (update True) s
 
 -- This code looks like it works for 4D, but in truth it works for 3D too as long
 -- as we *only* consider positions with w = 0, i.e. one 3D hyperplane of the 4D surface.
@@ -102,9 +102,9 @@ update :: Bool -> IntSet -> IntSet
 update isPart2 s = s'
  where
   activeCellsToCheck   = s
-  inactiveCellsToCheck = (IS.foldr (IS.union . (getAdj isPart2)) IS.empty s) IS.\\ s
-  activeCellsToFlip    = IS.filter (not . p . (countAdjActive isPart2 s)) activeCellsToCheck
+  inactiveCellsToCheck = IS.foldr (IS.union . getAdj isPart2) IS.empty s IS.\\ s
+  activeCellsToFlip    = IS.filter (not . p . countAdjActive isPart2 s) activeCellsToCheck
   p :: Int -> Bool
   p i = i == 2 || i == 3
-  inactiveCellsToFlip  = IS.filter ((== 3) . (countAdjActive isPart2 s)) inactiveCellsToCheck
-  s' = (IS.union s inactiveCellsToFlip) IS.\\ (activeCellsToFlip)
+  inactiveCellsToFlip  = IS.filter ((== 3) . countAdjActive isPart2 s) inactiveCellsToCheck
+  s' = IS.union s inactiveCellsToFlip IS.\\ activeCellsToFlip

@@ -27,46 +27,45 @@ data Expr1 = Single Expr2 | Mult Expr2 Expr1 deriving (Eq, Show)
 
 -- Evaluate an expression.
 evalTerm :: Term -> Int
-evalTerm (Val x) = x
+evalTerm (Val     x ) = x
 evalTerm (Bracket e1) = evalExpr1 e1
 evalExpr2 :: Expr2 -> Int
 evalExpr2 (Single2 t) = evalTerm t
 evalExpr2 (Addn t e2) = evalTerm t + evalExpr2 e2
 evalExpr1 :: Expr1 -> Int
-evalExpr1 (Single e2) = evalExpr2 e2
+evalExpr1 (Single e2 ) = evalExpr2 e2
 evalExpr1 (Mult e2 e1) = evalExpr2 e2 * evalExpr1 e1
 
 -- Parse a (left-associative) expression.
 myParse :: String -> Expr1
-myParse = fromMaybe (error "bad input")
-          . parseMaybe parseExpr1
-          . map changeBrackets
-          . reverse
-          . filter (not . isSpace)
-  where
-    changeBrackets '(' = ')'
-    changeBrackets ')' = '('
-    changeBrackets c   = c
+myParse =
+  fromMaybe (error "bad input")
+    . parseMaybe parseExpr1
+    . map changeBrackets
+    . reverse
+    . filter (not . isSpace)
+ where
+  changeBrackets '(' = ')'
+  changeBrackets ')' = '('
+  changeBrackets c   = c
 type Parser = Parsec String String
 parseExpr1 :: Parser Expr1
 parseExpr1 = try parseMult <|> (Single <$> parseExpr2)
 parseMult :: Parser Expr1
 parseMult = do
   expr2 <- parseExpr2
-  _ <- char '*'
-  expr1 <- parseExpr1
-  return $ Mult expr2 expr1
+  _     <- char '*'
+  Mult expr2 <$> parseExpr1
 parseExpr2 :: Parser Expr2
 parseExpr2 = try parseAdd <|> (Single2 <$> parseTerm)
 parseAdd :: Parser Expr2
 parseAdd = do
-  t <- parseTerm
-  _ <- char '+'
-  e2 <- parseExpr2
-  return $ Addn t e2
+  t  <- parseTerm
+  _  <- char '+'
+  Addn t <$> parseExpr2
 parseTerm :: Parser Term
 parseTerm = try parseVal <|> parseBracket
 parseVal :: Parser Term
-parseVal = (Val . read) <$> some digitChar
+parseVal = Val . read <$> some digitChar
 parseBracket :: Parser Term
 parseBracket = Bracket <$> (char '(' *> parseExpr1 <* char ')')

@@ -80,12 +80,11 @@ parseExpr = try parseCmpd <|> (Single <$> parseTerm)
 parseCmpd :: Parser Expr
 parseCmpd = do
   term <- parseTerm
-  op <- choice [(+) <$ char '+', (*) <$ char '*']
-  expr <- parseExpr
-  return $ Cmpd op term expr
+  op   <- choice [(+) <$ char '+', (*) <$ char '*']
+  Cmpd op term <$> parseExpr
 parseTerm :: Parser Term
 parseTerm = try parseVal <|> parseBracket
 parseVal :: Parser Term
-parseVal = (Val . read) <$> some digitChar
+parseVal = Val . read <$> some digitChar
 parseBracket :: Parser Term
 parseBracket = Bracket <$> (char '(' *> parseExpr <* char ')')

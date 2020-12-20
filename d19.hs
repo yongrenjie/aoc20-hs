@@ -1,7 +1,11 @@
-import           Control.Monad                  ( guard )
+import           Control.Monad                  ( guard
+                                                , void
+                                                )
 import           Data.List                      ( sortOn )
 import           Data.List.Split                ( splitOn )
-import           Data.Maybe                     ( isJust, fromJust )
+import           Data.Maybe                     ( isJust
+                                                , fromJust
+                                                )
 -- import           Debug.Trace                    ( trace )
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
@@ -54,7 +58,7 @@ import           Paths_aoc20_hs
 -
 - The concept is the same, just that the implementation is abit more awkward.
 -
-- By enabling the calls to `trace` in line 123, one can prove that this approach
+- By enabling the calls to `trace` in lines 127-131, one can prove that this approach
 - only parses each rule once.
 -
 -}
@@ -76,15 +80,15 @@ main = do
   print $ length (filter id successes)
 
   putStr "Part 2: "
-  let parser42  = getParser 42
-      parser31  = getParser 31
+  let parser42   = getParser 42
+      parser31   = getParser 31
       -- The new rule 0 is parser8' >> parser11', where parser8' is n times
       -- of parser42, and parser11 is m times of parser42 followed by m times
       -- of parser 31. So, altogether, the new rule 0 is (n + m) parser42's
       -- and m parser31's, where n > m > 0.
       newParser0 = do
-        n <- some (try parser42)
-        m <- some (parser31)  -- `some` enforces m > 0.
+        n <- some $ try parser42
+        m <- some parser31      -- `some` enforces m > 0.
         guard $ length n > length m
         return ()
       successes' = map (parseMessageWith newParser0) messages
@@ -104,40 +108,44 @@ tabulate :: [String] -> ([String] -> ItoP -> ItoP) -> ItoP
 tabulate sortedRules kernel = fp  -- fp is the fixed point, i.e. `getParser`.
  where
   table :: [Parser ()]
-  table = map (kernel sortedRules fp) [0..]
+  table = map (kernel sortedRules fp) [0 ..]
   fp    = (table !!)
 
 
 -- Kernel function which recursively depends on f (in line 94).
 getParserK :: [String] -> ItoP -> ItoP
 getParserK sortedRules fp = fromJust . parseMaybe pRule . (sortedRules !!)
-  where
-    pRule :: Parser (Parser ())
-    pRule = do
-      ruleNumber <- some digitChar
-      _          <- string ": "
-      ruleParser <- try pOrRule <|> try pAndRule <|> pCharRule
-      return ruleParser
-      -- By enabling the following line instead, we can prove that pRule is only
-      -- being called a total of 136 times (there are 136 rules in the input).
-      -- return $ ruleNumber `trace` ruleParser
+ where
+  pRule :: Parser (Parser ())
+  pRule = do
+    _ <- some digitChar
+    _ <- string ": "
+    try pOrRule <|> try pAndRule <|> pCharRule
+  -- By using the following implementation of pRule instead, we can prove
+  -- that pRule is only being called a total of 136 times (there are 136
+  -- rules in the input).
+  -- pRule = do
+  --   ruleNumber <- some digitChar
+  --   _          <- string ": "
+  --   ruleParser <- try pOrRule <|> try pAndRule <|> pCharRule
+  --   return $ ruleNumber `trace` ruleParser
 
-    pOrRule :: Parser (Parser ())
-    pOrRule = do
-      leftParser  <- pAndRule
-      _           <- string "| "
-      rightParser <- pAndRule
-      return $ (try leftParser <|> rightParser) >> return ()
-    pAndRule :: Parser (Parser ())
-    pAndRule = do
-      ruleNumbers <- some $ (read <$> some digitChar) <* space
-      return $ mapM_ fp ruleNumbers
-    pCharRule :: Parser (Parser ())
-    pCharRule = do
-      _ <- char '"'
-      c <- anySingle
-      _ <- char '"'
-      return $ char c >> return ()
+  pOrRule :: Parser (Parser ())
+  pOrRule = do
+    leftParser  <- pAndRule
+    _           <- string "| "
+    rightParser <- pAndRule
+    return $ void (try leftParser <|> rightParser)
+  pAndRule :: Parser (Parser ())
+  pAndRule = do
+    ruleNumbers <- some $ (read <$> some digitChar) <* space
+    return $ mapM_ fp ruleNumbers   -- Sequences the parsers for each rule.
+  pCharRule :: Parser (Parser ())
+  pCharRule = do
+    _ <- char '"'
+    c <- anySingle
+    _ <- char '"'
+    return $ void (char c)
 
 
 -- Run a parser on a given message.
