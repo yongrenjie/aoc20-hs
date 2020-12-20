@@ -1,21 +1,21 @@
-import qualified Data.IntMap                   as IM
-import           Data.IntMap                    ( IntMap )
 import           Data.List                      ( sortOn )
+import           Data.List.Split                ( splitOn )
 import           Data.Maybe                     ( isJust, fromJust )
 import           Debug.Trace                    ( trace )
 import           Text.Megaparsec
 import           Text.Megaparsec.Char
-import           Data.List.Split                ( splitOn )
 import           Paths_aoc20_hs
+
 
 main :: IO ()
 main = do
   fname <- getDataFileName "d19.txt"
   input <- readFile fname
   let [rules, messages] = map lines $ splitOn "\n\n" input
+      sortedRules = sortOn extractRuleNumber rules
 
   putStr "Part 1: "
-  let parser0   = getParser' rules 0
+  let parser0   = getParser' sortedRules 0
       successes = map (parseMessage parser0) messages
   print $ length (filter id successes)
 
@@ -30,33 +30,37 @@ extractRuleNumber :: String -> Int
 extractRuleNumber = read . head . splitOn ":"
 
 getParser' :: [String] -> Int -> Parser ()
-getParser' rules n = p n
+getParser' sortedRules n = p n
  where
-  table = IM.fromList $ map (parseRule rules) rules
-  p     = (table IM.!)
+  -- This is tantalisingly close to the typical memoisation model in Haskell,
+  -- but doesn't work 100%, as close to 1000 rules are being parsed (there are
+  -- only 136 rules in the puzzle input).
+  table = map (snd . parseRule sortedRules) sortedRules
+  p     = (table !!)
 
 parseRule :: [String] -> String -> (Int, Parser ())
 parseRule rules = fromJust . parseMaybe (pRuleToParser rules)
 
 pRuleToParser :: [String] -> Parser (Int, Parser ())
-pRuleToParser rules = do
+pRuleToParser srules = do
   ruleNumber <- read <$> some digitChar
   _          <- string ": "
-  ruleParser <- try (pOrRule rules) <|> try (pAndRule rules) <|> (pCharRule rules)
+  ruleParser <- try (pOrRule srules) <|> try (pAndRule srules) <|> (pCharRule srules)
   -- From these traced values it is obvious that the same rule is being parsed
-  -- multiple times (in total, 198696 values get traced!!!)
+  -- multiple times. (In total, 1461 values get traced, which is still 10x the number
+  -- of rules; however, it's already far better than the IntMap version.)
   return $ show ruleNumber `trace` (ruleNumber, ruleParser)
 
 pOrRule :: [String] -> Parser (Parser ())
-pOrRule rules = do
-  leftParser  <- pAndRule rules
+pOrRule srules = do
+  leftParser  <- pAndRule srules
   _           <- string "| "
-  rightParser <- pAndRule rules
+  rightParser <- pAndRule srules
   return $ (try leftParser <|> rightParser) >> return ()
 pAndRule :: [String] -> Parser (Parser ())
-pAndRule rules = do
+pAndRule srules = do
   ruleNumbers <- some $ (read <$> some digitChar) <* space
-  return $ mapM_ (getParser' rules) ruleNumbers
+  return $ mapM_ (getParser' srules) ruleNumbers
 pCharRule :: [String] -> Parser (Parser ())
 pCharRule _ = do
   _ <- char '"'
@@ -64,6 +68,6 @@ pCharRule _ = do
   _ <- char '"'
   return $ char c >> return ()
 
--- Then run the parsers on the given inputs
+-- Run a parser on a given message.
 parseMessage :: Parser () -> String -> Bool
 parseMessage parser message = isJust $ parseMaybe parser message
