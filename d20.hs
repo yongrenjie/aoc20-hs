@@ -147,12 +147,12 @@ countMatchableEdges allTiles tile = length . filter id $ searchHits
 flipH :: M.Matrix a -> M.Matrix a
 flipH m =
   let c = M.ncols m
-  in  (foldl' (\f x -> f . M.switchCols x (c + 1 - x)) id [1 .. c `div` 2]) m
+  in  foldl' (\f x -> f . M.switchCols x (c + 1 - x)) id [1 .. c `div` 2] m
 -- Flip a matrix vertically
 flipV :: M.Matrix a -> M.Matrix a
 flipV m =
   let r = M.nrows m
-  in  (foldl' (\f x -> f . M.switchRows x (r + 1 - x)) id [1 .. r `div` 2]) m
+  in  foldl' (\f x -> f . M.switchRows x (r + 1 - x)) id [1 .. r `div` 2] m
 -- Flip a tile horizontally
 tflipH :: Tile -> Tile
 tflipH (Tile i n e s w x) = Tile i (r n) (r w) (r s) (r e) (flipH x)
@@ -197,10 +197,10 @@ solveRow allTiles leftmost = map fromJust
     | edge == V.reverse (south tile) = trotate tile
     | edge == V.reverse (east tile)  = trotate . trotate $ tile
     | edge == V.reverse (north tile) = trotate . trotate . trotate $ tile
-    | edge == (west tile)            = tflipV tile
-    | edge == (south tile)           = trotate . tflipH $ tile
-    | edge == (east tile)            = tflipH tile
-    | edge == (north tile)           = tflipH . trotate $ tile
+    | edge == west tile              = tflipV tile
+    | edge == south tile             = trotate . tflipH $ tile
+    | edge == east tile              = tflipH tile
+    | edge == north tile             = tflipH . trotate $ tile
     | otherwise                        = error "uh oh: orientT in solveRow"
     -- There *has* to be a match, given that the tile we feed to orientT was
     -- obtained by searching for a match. If there isn't, something is wrong.
@@ -233,10 +233,10 @@ solveColumn allTiles topmost = map fromJust
     | edge == V.reverse (west tile)  = trotate tile
     | edge == V.reverse (south tile) = trotate . trotate $ tile
     | edge == V.reverse (east tile)  = trotate . trotate . trotate $ tile
-    | edge == (north tile)           = tflipH tile
-    | edge == (west tile)            = tflipH . trotate $ tile
-    | edge == (south tile)           = tflipV $ tile
-    | edge == (east tile)            = trotate . tflipH $ tile
+    | edge == north tile             = tflipH tile
+    | edge == west tile              = tflipH . trotate $ tile
+    | edge == south tile             = tflipV tile
+    | edge == east tile              = trotate . tflipH $ tile
     | otherwise                        = error "uh oh: orientT in solveColumn"
 
 
@@ -260,7 +260,7 @@ orientTopLeftCorner allTiles tile = tile'
   tile' | sIn && eIn = tile
         | wIn && sIn = trotate . trotate . trotate $ tile
         | nIn && wIn = trotate . trotate $ tile
-        | eIn && nIn = trotate $ tile
+        | eIn && nIn = trotate tile
         | otherwise  = error "uh oh: orientTopLeftCorner"
 
 

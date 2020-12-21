@@ -37,3 +37,4 @@ Prelude> [(x, y) | x <- [1..2], y <- "abc"]
 - **Day 19** This was really hard. The naive solution of parsing each rule into a Parser () doesn't work, because the returned parsers are built from other parsers, which leads to an infinite loop. I considered lots and lots of options, including making all the parsers IO-based (didn't work), and threading an `IntMap` through each of them. Eventually I found that it sufficed to thread the rules through each parser, and it turns out that GHC does some automatic memoisation. I also struggled through the Oxford notes on memoisation / dynamic programming. I don't think I fully understand it yet, but we're getting there.
 - (**Day 19, revisited**: I figured out the memoisation!! See comments in `d19.hs` for explanation.)
 - **Day 20**: Basic matrix and vector operations using `Data.Matrix` and `Data.Vector`. Otherwise, though, this day's solution was very inelegant.
+- **Day 21** was chill (thank goodness!)
