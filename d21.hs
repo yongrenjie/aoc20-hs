@@ -6,7 +6,7 @@ import           Data.List                      ( foldl1'
 import           Data.List.Split                ( splitOn )
 import           Data.Set                       ( Set )
 import qualified Data.Set                      as S
-import           Paths_aoc20_hs
+import           Paths_aoc20_hs                 ( getDataFileName )
 
 main :: IO ()
 main = do
@@ -22,8 +22,7 @@ main = do
       -- The remaining ones are definitely good.
       definiteGoodIngrs = allIngredients S.\\ possibleBadIngrs
   putStr "Part 1: "
-  print $ sum $ map (S.size . S.intersection definiteGoodIngrs . ingredients)
-                    foods
+  print $ sum $ map (S.size . S.intersection definiteGoodIngrs . ingredients) foods
 
   -- By a process of elimination, we can assign each allergen to one single
   -- ingredient.
