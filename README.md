@@ -38,3 +38,4 @@ Prelude> [(x, y) | x <- [1..2], y <- "abc"]
 - (**Day 19, revisited**: I figured out the memoisation!! See comments in `d19.hs` for explanation.)
 - **Day 20**: Basic matrix and vector operations using `Data.Matrix` and `Data.Vector`. Otherwise, though, this day's solution was very inelegant.
 - **Day 21** was chill (thank goodness!)
+- **Day 22** `Data.Sequence`. But otherwise this was quite straightforward, too.

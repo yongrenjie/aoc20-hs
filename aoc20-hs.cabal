@@ -26,23 +26,6 @@ common base-stanza
                        -fwrite-ide-info
                        -hiedir=.hie
 
-common base-stanza-relude
-  build-depends:       base ^>=4.14
-                       , relude ^>=0.7.0.0
-                       , split
-                       , text
-                       , containers
-                       , megaparsec
-                       , mtl
-  default-language:    Haskell2010
-  other-modules:       Paths_aoc20_hs
-  ghc-options:         -Wall
-                       -fwrite-ide-info
-                       -hiedir=.hie
-  mixins:              base hiding (Prelude)
-                       , relude (Relude as Prelude)
-
-
 executable d1
   import:              base-stanza
   main-is:             d1.hs
@@ -131,3 +114,7 @@ executable d20
 executable d21
   import:              base-stanza
   main-is:             d21.hs
+
+executable d22
+  import:              base-stanza
+  main-is:             d22.hs
