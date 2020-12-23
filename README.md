@@ -39,3 +39,4 @@ Prelude> [(x, y) | x <- [1..2], y <- "abc"]
 - **Day 20**: Basic matrix and vector operations using `Data.Matrix` and `Data.Vector`. Otherwise, though, this day's solution was very inelegant.
 - **Day 21** was chill (thank goodness!)
 - **Day 22** `Data.Sequence`. But otherwise this was quite straightforward, too. (I later changed it to use plain lists and it turns out that that's 2x faster, probably because the lists are quite short, so the asymptotic behaviour isn't so important.)
+- **Day 23** Revised some C and figured out a very basic use of the Haskell C FFI.

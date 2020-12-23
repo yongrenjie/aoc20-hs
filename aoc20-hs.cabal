@@ -118,3 +118,8 @@ executable d21
 executable d22
   import:              base-stanza
   main-is:             d22.hs
+
+executable d23
+  import:              base-stanza
+  main-is:             d23.hs
+  c-sources:           d23b.c
