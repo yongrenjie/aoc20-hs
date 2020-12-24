@@ -122,4 +122,5 @@ executable d22
 executable d23
   import:              base-stanza
   main-is:             d23.hs
-  c-sources:           d23b.c
+  build-depends:       vector
+  c-sources:           d23.c

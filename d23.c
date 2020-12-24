@@ -1,22 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "d23b.h"
+#include "d23.h"
 
 /* int main (void) */
 /* { */
-/*     long int ans = aoc_d23_part2(); */
+/*     int first_input[] = {6, 2, 4, 3, 9, 7, 1, 5, 8}; */
+/*     long int ans = run_game(first_input, 9, 1000000, 10000000); */
 /*     printf("%ld\n", ans); */
 /* } */
-
-long int aoc_d23_part2(void)
-{
-    int first_input[] = {6, 2, 4, 3, 9, 7, 1, 5, 8};
-    return run_game(first_input, 9, 1000000, 10000000);
-
-    /* Part 1 */
-    /* int first_input[] = {3, 8, 9, 1, 2, 5, 4, 6, 7}; */
-    /* return run_game(first_input, 9, 9, 10); */
-}
 
 long int run_game(int *first_input, int first_input_len, int full_len, int nrounds) {
     // Initialise the game array
