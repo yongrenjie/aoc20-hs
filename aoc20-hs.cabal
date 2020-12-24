@@ -124,3 +124,9 @@ executable d23
   main-is:             d23.hs
   build-depends:       vector
   c-sources:           d23.c
+
+executable d24
+  import:              base-stanza
+  main-is:             d24.hs
+  build-depends:       bifunctor
+
