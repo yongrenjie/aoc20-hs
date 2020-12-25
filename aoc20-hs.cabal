@@ -130,3 +130,6 @@ executable d24
   main-is:             d24.hs
   build-depends:       bifunctor
 
+executable d25
+  import:              base-stanza
+  main-is:             d25.hs
